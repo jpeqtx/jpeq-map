@@ -6,6 +6,8 @@
     <title>Typhoon Circles</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet.Geodesic プラグイン：地球の曲率を考慮した正しい円を描画する -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic@1.4.0/dist/leaflet.geodesic.min.js"></script>
     <style>
         body { margin:0; }
         #map { width:100vw; height:100vh; }
@@ -23,26 +25,29 @@
         const params = new URLSearchParams(window.location.search);
         const lat = parseFloat(params.get('lat'));
         const lng = parseFloat(params.get('lng'));
-        const storm = parseFloat(params.get('storm'));
-        const gale = parseFloat(params.get('gale'));
+        const storm = parseFloat(params.get('storm')); // km
+        const gale = parseFloat(params.get('gale'));   // km
 
         if (!isNaN(lat) && !isNaN(lng)) {
             map.setView([lat, lng], 7);
             L.marker([lat, lng]).addTo(map).bindPopup('Typhoon Center');
 
             if (!isNaN(gale) && gale > 0) {
-                L.circle([lat, lng], {
-                    radius: gale * 1000,
+                // 測地線円（Geodesic Circle）で正しい半径を描画
+                L.geodesicCircle([lat, lng], {
+                    radius: gale * 1000, // convert km to meters
                     color: 'orange',
-                    fillOpacity: 0.15
+                    fillOpacity: 0.15,
+                    steps: 64 // 円を滑らかにする分割数
                 }).addTo(map).bindPopup(`Gale area: ${gale} km radius`);
             }
 
             if (!isNaN(storm) && storm > 0) {
-                L.circle([lat, lng], {
+                L.geodesicCircle([lat, lng], {
                     radius: storm * 1000,
                     color: 'red',
-                    fillOpacity: 0.25
+                    fillOpacity: 0.25,
+                    steps: 64
                 }).addTo(map).bindPopup(`Storm area: ${storm} km radius`);
             }
         } else {
