@@ -57,10 +57,25 @@
 
         if (!isNaN(lat) && !isNaN(lng)) {
             map.setView([lat, lng], 7);
-            const popupText = isEpicenter ? 'Epicenter' : 'Typhoon Center';
-            L.marker([lat, lng]).addTo(map).bindPopup(popupText);
+            const marker = L.marker([lat, lng]).addTo(map);
 
-            if (!isEpicenter) {
+            if (isEpicenter) {
+                // 震央モードでは「Epicenter」を常時表示
+                marker.bindTooltip('Epicenter', {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -10]
+                });
+            } else {
+                // 台風モードでは「Near the center of the typhoon」を常時表示
+                marker.bindTooltip('Near the center of the typhoon', {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -10]
+                });
+                // クリック時にも詳細を表示
+                marker.bindPopup('Typhoon Center');
+
                 let hasCircles = false;
                 if (!isNaN(gale) && gale > 0) {
                     L.circle([lat, lng], {
