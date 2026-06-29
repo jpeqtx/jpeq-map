@@ -19,7 +19,7 @@
             line-height: 1.6;
             position: absolute;
             bottom: 20px;
-            left: 20px;                 /* 左下に変更 */
+            left: 20px;
             z-index: 1000;
         }
         .legend-item { display: flex; align-items: center; margin: 2px 0; }
@@ -29,17 +29,30 @@
             margin-right: 8px;
             border: 1px solid #666;
         }
-        /* OpenStreetMap attribution を確実に表示 */
-        .leaflet-control-attribution {
-            font-size: 10px !important;
-            background: rgba(255,255,255,0.9) !important;
-            padding: 2px 5px !important;
-            z-index: 1001 !important;   /* legend より前面に */
+        .osm-attribution {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 6px;
+            font-size: 10px;
+            font-family: sans-serif;
+            z-index: 1002;
+            border-radius: 3px 0 0 0;
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+            line-height: 1.4;
+        }
+        .osm-attribution a {
+            color: #0078d4;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div class="osm-attribution">
+        &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+    </div>
     <div class="legend" id="legend" style="display:none;">
         <div class="legend-item"><div class="legend-color" style="background:rgba(255,0,0,0.5);"></div> Storm Area</div>
         <div class="legend-item"><div class="legend-color" style="background:rgba(255,165,0,0.4);"></div> Gale Area</div>
@@ -56,11 +69,10 @@
         document.title = isEpicenter ? 'Epicenter' : 'Typhoon Wind Areas';
 
         const map = L.map('map', {
-            attributionControl: true  // 明示的に有効化
+            attributionControl: false
         }).setView([35, 135], 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
             maxZoom: 18
         }).addTo(map);
 
