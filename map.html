@@ -19,7 +19,7 @@
             line-height: 1.6;
             position: absolute;
             bottom: 20px;
-            right: 20px;
+            left: 20px;                 /* 左下に変更 */
             z-index: 1000;
         }
         .legend-item { display: flex; align-items: center; margin: 2px 0; }
@@ -28,6 +28,13 @@
             border-radius: 50%;
             margin-right: 8px;
             border: 1px solid #666;
+        }
+        /* OpenStreetMap attribution を確実に表示 */
+        .leaflet-control-attribution {
+            font-size: 10px !important;
+            background: rgba(255,255,255,0.9) !important;
+            padding: 2px 5px !important;
+            z-index: 1001 !important;   /* legend より前面に */
         }
     </style>
 </head>
@@ -46,12 +53,14 @@
         const type = params.get('type');
         const isEpicenter = (type === 'epicenter') || (!storm && !gale);
 
-        // タイトル切替
         document.title = isEpicenter ? 'Epicenter' : 'Typhoon Wind Areas';
 
-        const map = L.map('map').setView([35, 135], 5);
+        const map = L.map('map', {
+            attributionControl: true  // 明示的に有効化
+        }).setView([35, 135], 5);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
             maxZoom: 18
         }).addTo(map);
 
@@ -60,20 +69,17 @@
             const marker = L.marker([lat, lng]).addTo(map);
 
             if (isEpicenter) {
-                // 震央モードでは「Epicenter」を常時表示
                 marker.bindTooltip('Epicenter', {
                     permanent: true,
                     direction: 'top',
                     offset: [0, -10]
                 });
             } else {
-                // 台風モードでは「Near the center of the typhoon」を常時表示
                 marker.bindTooltip('Near the center of the typhoon', {
                     permanent: true,
                     direction: 'top',
                     offset: [0, -10]
                 });
-                // クリック時にも詳細を表示
                 marker.bindPopup('Typhoon Center');
 
                 let hasCircles = false;
